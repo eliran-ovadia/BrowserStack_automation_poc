@@ -1,7 +1,7 @@
 import pytest
 from appium import webdriver
 import dotenv
-#from appium.options.android import UiAutomator2Options
+from appium.options.android import UiAutomator2Options
 
 dotenv.load_dotenv()
 

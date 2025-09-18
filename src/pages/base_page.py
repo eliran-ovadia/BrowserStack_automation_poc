@@ -15,7 +15,6 @@ class BasePage:
         self.driver = driver
         self.wait = WebDriverWait(driver, timeout)
         self.platform = (driver.capabilities.get("platformName") or "").lower()
-
         # Logger
         self.logger = logging.getLogger(self.__class__.__name__)
         if not self.logger.handlers:
@@ -26,7 +25,6 @@ class BasePage:
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
             self.logger.setLevel(logging.INFO)
-
         self.logger.info("Initializing base page, platform: %s", self.platform)
 
 
@@ -48,12 +46,14 @@ class BasePage:
 
     # ---------- Element Interactions ----------
     def tap(self, locator: dict | Tuple[str, str]) -> None:
+        """ Tap an element on the page """
         loc = self.loc(locator)
         self.logger.info(f"tap: Clicking element: {loc}")
         el = self.wait.until(EC.visibility_of_element_located(loc)) # Wait for clickable not visible, will keep an eye
         el.click()
 
     def write(self, locator: dict | Tuple[str, str], text: str) -> None:
+        """ Write to a textbox"""
         loc = self.loc(locator)
         self.logger.info(f"Typing '{text}' into: {loc}")
         el = self.wait.until(EC.visibility_of_element_located(loc))
@@ -69,11 +69,13 @@ class BasePage:
             return False
 
     def get_text(self, locator: dict | Tuple[str, str]) -> str:
+        """ Given a locator, return the text it contains"""
         loc = self.loc(locator)
         el = self.wait.until(EC.visibility_of_element_located(loc))
         return el.text
 
     def find_element(self, locator: dict | Tuple[str, str]) -> WebElement:
+        """ Wait for an element to be locatable by presence(not explicitly visible)"""
         loc = self.loc(locator)
         return self.wait.until(EC.presence_of_element_located(loc))
 

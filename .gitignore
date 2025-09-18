@@ -1,2 +1,4 @@
 .env
 browserstack.yml
+log
+local.log
