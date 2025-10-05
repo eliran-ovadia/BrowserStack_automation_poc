@@ -1,6 +1,9 @@
 from appium.webdriver.common.appiumby import AppiumBy
 
 from src.pages.base_page import BasePage
+from src.pages.currency_exchange_page import CurrencyExchangePage
+from src.pages.fund_my_account_page import FundMyAccountPage
+from src.pages.invite_your_friend_page import InviteYourFriedPage
 from src.pages.portfolio_page import PortfolioPage
 from src.pages.profile_page import ProfilePage
 from src.pages.settings_page import SettingsPage
@@ -31,6 +34,18 @@ class DashboardPage(BasePage):
         }
         self.trade_portfolio_button = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("My Portfolio")'),
+            "ios": ("", "")
+        }
+        self.fund_my_account_button_text = {
+            "android" : (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Fund My Account")'),
+            "ios": ("", "")
+        }
+        self.invite_your_friend_button_text = {
+            "android" : (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Invite Your Friend")'),
+            "ios": ("", "")
+        }
+        self.currency_exchange_button_text = {
+            "android" : (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Currency Exchange")'),
             "ios": ("", "")
         }
         # --------------------Demo card ----------------------
@@ -66,3 +81,17 @@ class DashboardPage(BasePage):
         settings = SettingsPage(self.driver)
         return settings
 
+    def enter_fund_my_account(self) -> FundMyAccountPage:
+        self.tap(self.fund_my_account_button_text)
+        fund_my_account = FundMyAccountPage(self.driver)
+        return fund_my_account
+
+    def enter_invite_your_friend(self) -> InviteYourFriedPage:
+        self.tap(self.invite_your_friend_button_text)
+        invite_your_friend = InviteYourFriedPage(self.driver)
+        return invite_your_friend
+
+    def enter_currency_exchange(self) -> CurrencyExchangePage:
+        self.tap(self.currency_exchange_button_text)
+        currency_exchange = CurrencyExchangePage(self.driver)
+        return currency_exchange
