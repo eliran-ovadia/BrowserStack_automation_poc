@@ -2,6 +2,7 @@
 
 from src.flows.base_flow import BaseFlow
 from src.pages.terms_page import TermsPage
+from src.pages.dashboard_page import DashboardPage
 
 
 class LoginFlow(BaseFlow):
@@ -9,7 +10,7 @@ class LoginFlow(BaseFlow):
         super().__init__(driver)
         self.driver = driver
 
-    def login_with_email_and_password(self):
+    def login_with_email_and_password(self) -> DashboardPage:
         self.log_step("Logging in with email and password")
 
         dashboard = (

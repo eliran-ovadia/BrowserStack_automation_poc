@@ -90,7 +90,7 @@ class BasePage:
         )
         return self.driver.find_element(*scrollable)  # We rely on UiScrollable for waiting until finding the element
 
-    def scroll_to_locator(self, locator: dict | Tuple[str, str], horizontal: bool = False) -> WebElement:
+    def scroll(self, locator: dict | Tuple[str, str], horizontal: bool = False) -> WebElement:
         loc = self.loc(locator)
         self.logger.info(f"Scrolling to locator: {locator}")
         scrollable = (
@@ -107,5 +107,5 @@ class BasePage:
 
     def scroll_to_and_click_locator(self, locator: dict | Tuple[str, str], horizontal: bool = False) -> None:
         loc = self.loc(locator)
-        el = self.scroll_to_locator(loc, horizontal)
-        el.click()
+        el = self.scroll(loc, horizontal)
+        self.tap(loc)
