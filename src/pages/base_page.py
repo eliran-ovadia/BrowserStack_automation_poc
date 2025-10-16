@@ -43,14 +43,20 @@ class BasePage:
             return mapping_or_tuple["ios"]
         return mapping_or_tuple["android"]  # default branch
 
-
-    # ---------- Element Interactions ----------
+    # ------------- Clicking Elements -----------------
     def tap(self, locator: dict | Tuple[str, str]) -> None:
         """ Tap an element on the page """
         loc = self.loc(locator)
         self.logger.info(f"tap: Clicking element: {loc}")
-        el = self.wait.until(EC.visibility_of_element_located(loc)) # Wait for clickable not visible, will keep an eye
+        el = self.wait.until(EC.element_to_be_clickable(loc)) # Wait for clickable not visible, will keep an eye
         el.click()
+    # ------------------------------------------------
+    # ---------- Read\Write to locators --------------
+    def read(self, locator: dict | Tuple[str, str]) -> str:
+        """ Given a locator, return the text it contains"""
+        loc = self.loc(locator)
+        el = self.wait.until(EC.visibility_of_element_located(loc))
+        return el.text
 
     def write(self, locator: dict | Tuple[str, str], text: str) -> None:
         """ Write to a textbox"""
@@ -59,7 +65,8 @@ class BasePage:
         el = self.wait.until(EC.visibility_of_element_located(loc))
         el.clear()
         el.send_keys(text)
-
+    # -----------------------------------------------
+    # --------- Visibility Checks -------------------
     def is_visible(self, locator: dict | Tuple[str, str]) -> bool:
         loc = self.loc(locator)
         try:
@@ -68,18 +75,15 @@ class BasePage:
         except TimeoutException:
             return False
 
-    def get_text(self, locator: dict | Tuple[str, str]) -> str:
-        """ Given a locator, return the text it contains"""
+    def is_present(self, locator: dict | Tuple[str, str]) -> bool:
         loc = self.loc(locator)
-        el = self.wait.until(EC.visibility_of_element_located(loc))
-        return el.text
-
-    def find_element(self, locator: dict | Tuple[str, str]) -> WebElement:
-        """ Wait for an element to be locatable by presence(not explicitly visible)"""
-        loc = self.loc(locator)
-        return self.wait.until(EC.presence_of_element_located(loc))
-
-    # ---------- Scrolling ----------
+        try:
+            self.wait.until(EC.presence_of_element_located(loc))
+            return True
+        except TimeoutException:
+            return False
+    # --------------------------------------------
+    # ---------- Scrolling -----------------------
     def scroll_to_text(self, text: str, horizontal: bool = False) -> WebElement:
         self.logger.info(f"Scrolling to text: {text}")
         scrollable = (
@@ -90,22 +94,14 @@ class BasePage:
         )
         return self.driver.find_element(*scrollable)  # We rely on UiScrollable for waiting until finding the element
 
-    def scroll(self, locator: dict | Tuple[str, str], horizontal: bool = False) -> WebElement:
-        loc = self.loc(locator)
-        self.logger.info(f"Scrolling to locator: {locator}")
+    def scroll_to_locator(self, to_locator: dict | Tuple[str, str], horizontal: bool = False):
+        """Scroll a UiAutomator locator (ONLY!!)"""
+        loc = self.loc(to_locator)
+        self.logger.info(f"Scrolling to locator: {to_locator}")
         scrollable = (
             AppiumBy.ANDROID_UIAUTOMATOR,
             f'new UiScrollable(new UiSelector().scrollable(true))'
             f'{".setAsHorizontalList()" if horizontal else ""}'
             f'.scrollIntoView({loc[1]})'
         )
-        return self.driver.find_element(*scrollable)  # We rely on UiScrollable for waiting until finding the element
-
-    def scroll_to_and_click_text(self, text: str, horizontal: bool = False) -> None:
-        el = self.scroll_to_text(text, horizontal)
-        el.click()
-
-    def scroll_to_and_click_locator(self, locator: dict | Tuple[str, str], horizontal: bool = False) -> None:
-        loc = self.loc(locator)
-        el = self.scroll(loc, horizontal)
-        self.tap(loc)
+    # -----------------------------------------

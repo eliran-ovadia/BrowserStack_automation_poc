@@ -21,6 +21,7 @@ class TestLogin:
         dashboard = LoginFlow(set_web_driver).login_with_email_and_password()
         dashboard.enter_currency_exchange()
 
+    @pytest.mark.smoke
     def test_moving_between_pages(self, set_web_driver):
         dashboard = LoginFlow(set_web_driver).login_with_email_and_password()
         portfolio = dashboard.enter_trade()

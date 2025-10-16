@@ -3,7 +3,7 @@ from appium.webdriver.common.appiumby import AppiumBy
 from src.pages.base_page import BasePage
 from src.pages.currency_exchange_page import CurrencyExchangePage
 from src.pages.fund_my_account_page import FundMyAccountPage
-from src.pages.invite_your_friend_page import InviteYourFriedPage
+from src.pages.invite_your_friend_page import InviteYourFriendPage
 from src.pages.portfolio_page import PortfolioPage
 from src.pages.profile_page import ProfilePage
 from src.pages.settings_page import SettingsPage
@@ -69,7 +69,8 @@ class DashboardPage(BasePage):
         return portfolio
 
     def enter_demo(self): # Capabilities demonstration only
-        self.scroll_to_and_click_locator(self.demo_portfolio_button, horizontal=True)
+        self.scroll_to_locator(self.demo_portfolio_button, horizontal=True)
+        self.tap(self.demo_portfolio_button)
 
     def enter_profile(self) -> ProfilePage:
         self.tap(self.profile_button)
@@ -86,9 +87,9 @@ class DashboardPage(BasePage):
         fund_my_account = FundMyAccountPage(self.driver)
         return fund_my_account
 
-    def enter_invite_your_friend(self) -> InviteYourFriedPage:
+    def enter_invite_your_friend(self) -> InviteYourFriendPage:
         self.tap(self.invite_your_friend_button_text)
-        invite_your_friend = InviteYourFriedPage(self.driver)
+        invite_your_friend = InviteYourFriendPage(self.driver)
         return invite_your_friend
 
     def enter_currency_exchange(self) -> CurrencyExchangePage:

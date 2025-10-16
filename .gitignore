@@ -2,3 +2,4 @@
 browserstack.yml
 log
 local.log
+*.log
