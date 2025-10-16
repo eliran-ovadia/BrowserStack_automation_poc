@@ -69,8 +69,7 @@ class DashboardPage(BasePage):
         return portfolio
 
     def enter_demo(self): # Capabilities demonstration only
-        self.scroll_to_locator(self.demo_portfolio_button, horizontal=True)
-        self.tap(self.demo_portfolio_button)
+        self.scroll_to_and_tap_locator(self.demo_portfolio_button, horizontal=True)
 
     def enter_profile(self) -> ProfilePage:
         self.tap(self.profile_button)
