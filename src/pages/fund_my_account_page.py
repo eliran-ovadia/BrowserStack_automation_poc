@@ -1,7 +1,7 @@
-from src.flows.base_flow import BaseFlow
+from src.pages.base_page import BasePage
 
 
-class FundMyAccountPage(BaseFlow):
+class FundMyAccountPage(BasePage):
     def __init__(self, driver):
         super().__init__(driver)
         self.driver = driver

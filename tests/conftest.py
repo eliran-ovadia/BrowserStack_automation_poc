@@ -1,6 +1,6 @@
+import dotenv
 import pytest
 from appium import webdriver
-import dotenv
 from appium.options.android import UiAutomator2Options
 
 dotenv.load_dotenv()
@@ -15,7 +15,6 @@ dotenv.load_dotenv()
 #     driver.quit()
 
 
-
 # ----------------------USE TO RUN LOCALLY (DELETE CLASS FIXTURE AS WELL)(import UiAutomator2Options)-------------
 local_caps = {
     "platformName": "Android",
@@ -28,8 +27,10 @@ local_caps = {
     # Quality-of-life:
     "appium:autoGrantPermissions": True,
     "appium:newCommandTimeout": 120,
-    #"appium:noReset": True, # Keep app state between runs
+    # "appium:noReset": True, # Keep app state between runs
 }
+
+
 @pytest.fixture(scope="function")
 def set_web_driver(request):
     opts = UiAutomator2Options().load_capabilities(local_caps)
@@ -37,4 +38,3 @@ def set_web_driver(request):
 
     yield driver
     driver.quit()
-

@@ -1,11 +1,8 @@
-# pages/welcome_page.py
-
 import os
 
 from appium.webdriver.common.appiumby import AppiumBy
 
 from src.pages.base_page import BasePage
-from src.pages.otp_page import OtpPage
 
 
 class WelcomePage(BasePage):
@@ -15,11 +12,11 @@ class WelcomePage(BasePage):
         # Locators ----------------------
         self.username_field = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().className("android.widget.EditText")'),
-            "ios": ("","")
+            "ios": ("", "")
         }
         self.login_button = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Login")'),
-            "ios": ("","")
+            "ios": ("", "")
         }
 
     def enter_username(self):
@@ -30,4 +27,3 @@ class WelcomePage(BasePage):
     def tap_welcome_login(self):
         self.tap(self.login_button)
         self.logger.info(f"Tapped login button")
-        return OtpPage(self.driver)

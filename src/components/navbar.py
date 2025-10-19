@@ -3,6 +3,7 @@ from appium.webdriver.common.appiumby import AppiumBy
 
 class NavBar:
     """Bottom navigation bar for Trade bottom section (portfolio, market, search, orders, knowledge"""
+
     def __init__(self, tap_fn):
         self.tap = tap_fn
         # --- Locators ---------------------
@@ -25,7 +26,7 @@ class NavBar:
         }
         self.knowledge_button = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Knowledge")'),
-            "ios": ("","")
+            "ios": ("", "")
         }
 
     def tap_portfolio(self):

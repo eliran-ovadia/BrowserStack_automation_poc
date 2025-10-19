@@ -1,4 +1,3 @@
-# src/pages/base_page.py
 import logging
 from typing import Tuple, Union, Dict
 

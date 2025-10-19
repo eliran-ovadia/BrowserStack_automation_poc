@@ -3,7 +3,6 @@ import os
 from appium.webdriver.common.appiumby import AppiumBy
 
 from src.pages.base_page import BasePage
-from src.pages.dashboard_page import DashboardPage
 
 
 class LoginWithPasswordPage(BasePage):
@@ -13,17 +12,16 @@ class LoginWithPasswordPage(BasePage):
         # Locators ----------------------
         self.forgot_password_button = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Forgot password?")'),
-            "ios": ("","")
+            "ios": ("", "")
         }
         self.password_input_field = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().className("android.widget.EditText")'),
-            "ios": ("","")
+            "ios": ("", "")
         }
         self.login_button = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Login")'),
-            "ios": ("","")
+            "ios": ("", "")
         }
-
 
     def enter_password(self):
         self.write(self.password_input_field, self.password)
@@ -33,4 +31,3 @@ class LoginWithPasswordPage(BasePage):
     def tap_password_login(self):
         self.tap(self.login_button)
         self.logger.info("Tapped Login on password page")
-        return DashboardPage(self.driver)
