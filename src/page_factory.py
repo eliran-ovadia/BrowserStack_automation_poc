@@ -9,7 +9,7 @@ class PageFactory:
         self.registry: dict[str, Type[BasePage]] = dict(PAGE_REGISTRY)
 
 
-    def get_page(self, name: Literal[PAGE_LITERAL]) -> BasePage:
+    def get_page(self, name: PAGE_LITERAL) -> BasePage:
         try:
             cls = self.registry[name]
         except KeyError:

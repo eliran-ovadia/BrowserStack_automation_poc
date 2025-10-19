@@ -1,12 +1,10 @@
-from typing import Literal
-
 from appium.webdriver.common.appiumby import AppiumBy
+
 
 class NavBar:
     """Bottom navigation bar for Trade bottom section (portfolio, market, search, orders, knowledge"""
-    def __init__(self, driver, tap_fn):
-        self.driver = driver
-        self.tap_fn = tap_fn
+    def __init__(self, tap_fn):
+        self.tap = tap_fn
         # --- Locators ---------------------
         self.portfolio_button = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Portfolio")'),
@@ -30,7 +28,17 @@ class NavBar:
             "ios": ("","")
         }
 
-    # todo: convert to regular more verbose functions instead of dynamically getattr
-    def navigate_to(self, to_page: Literal["portfolio", "market", "search", "orders", "knowledge"]):
-        page = getattr(self, f"{to_page}_button")
-        self.tap_fn(page)
+    def tap_portfolio(self):
+        self.tap(self.portfolio_button)
+
+    def tap_market(self):
+        self.tap(self.market_button)
+
+    def tap_search(self):
+        self.tap(self.search_button)
+
+    def tap_orders(self):
+        self.tap(self.orders_button)
+
+    def tap_knowledge(self):
+        self.tap(self.knowledge_button)
