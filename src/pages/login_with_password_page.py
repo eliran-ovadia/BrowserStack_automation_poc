@@ -6,7 +6,7 @@ from src.pages.base_page import BasePage
 from src.pages.dashboard_page import DashboardPage
 
 
-class LogInWithPasswordPage(BasePage):
+class LoginWithPasswordPage(BasePage):
     def __init__(self, driver):
         super().__init__(driver)
         self.password = os.getenv('PASSWORD')

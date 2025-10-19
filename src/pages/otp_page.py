@@ -1,7 +1,7 @@
 from appium.webdriver.common.appiumby import AppiumBy
 
 from src.pages.base_page import BasePage
-from src.pages.login_with_password_page import LogInWithPasswordPage
+from src.pages.login_with_password_page import LoginWithPasswordPage
 
 
 class OtpPage(BasePage):
@@ -15,4 +15,4 @@ class OtpPage(BasePage):
 
     def tap_login_with_password(self):
         self.tap(self.login_with_password_button)
-        return LogInWithPasswordPage(self.driver)
+        return LoginWithPasswordPage(self.driver)
