@@ -1,7 +1,5 @@
 from src.flows.base_flow import BaseFlow
 from src.page_factory import PageFactory
-from src.pages.terms_page import TermsPage
-
 
 class LoginFlow(BaseFlow):
 
@@ -9,55 +7,30 @@ class LoginFlow(BaseFlow):
         super().__init__(driver)
         self.driver = driver
         self.pf = factory or PageFactory(driver)
-        self.page = TermsPage(driver)
 
-    # ---------- Step-by-step (fluent internal API) ----------
-    def accept_terms(self):
-        self.log_step("Accepting terms and conditions")
-        self.page.accept_terms()
-        self.page = self.pf.welcome()
-        return self
+    def login_with_credentials(self):
+        terms = self.pf.terms()
+        terms.accept_terms()
 
-    def enter_username(self):
-        self.page.enter_username()
-        return self
+        welcome = self.pf.welcome()
+        welcome.enter_username()
+        welcome.tap_welcome_login()
 
-    def tap_welcome_login(self):
-        self.log_step("Tapping login on Welcome page")
-        self.page.tap_welcome_login()
-        self.page = self.pf.otp()
-        return self
+        otp = self.pf.otp()
+        otp.tap_login_with_password()
 
-    def switch_to_password_page(self):
-        self.log_step("Switching to password page")
-        self.page.tap_login_with_password()
-        self.page = self.pf.login_with_password()
-        return self
+        password_login = self.pf.login_with_password()
+        password_login.enter_password()
+        password_login.tap_password_login()
 
-    def enter_password(self):
-        self.log_step("Entering password")
-        self.page.enter_password()
-        return self
+        dashboard = self.pf.dashboard()
+        return dashboard
 
-    def tap_password_login(self):
-        self.log_step("Tapping Login button with password")
-        self.page.tap_password_login()
-        self.page = self.pf.dashboard()
-        return self
+    def enter_trade_with_credentials(self):
+        dashboard = self.login_with_credentials()
+        dashboard.nav_trade_portfolio()
 
-    def end(self):
-        """Return the final page object after the flow completes."""
-        self.log_step("Reached Dashboard")
-        return self.page
+        portfolio = self.pf.portfolio()
+        return portfolio
 
-    # ---------- Public API for tests ----------
-    def login_with_email_and_password(self):
-        return (
-            self.accept_terms()
-                .enter_username()
-                .tap_welcome_login()
-                .switch_to_password_page()
-                .enter_password()
-                .tap_password_login()
-                .end()
-        )
+

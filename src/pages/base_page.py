@@ -2,6 +2,7 @@ import logging
 from typing import Tuple, Union, Dict
 
 from appium.webdriver.common.appiumby import AppiumBy
+from appium.webdriver.extensions.android.nativekey import AndroidKey
 from appium.webdriver.webdriver import WebDriver
 from appium.webdriver.webelement import WebElement
 from selenium.common.exceptions import TimeoutException
@@ -19,19 +20,11 @@ class BasePage:
         self.wait = WebDriverWait(driver, timeout)
         self.platform = (driver.capabilities.get("platformName") or "").lower()
 
-        # Logger (avoid duplicate handlers across reloads)
         self.logger = logging.getLogger(self.__class__.__name__)
-        if not self.logger.handlers:
-            handler = logging.StreamHandler()
-            handler.setFormatter(logging.Formatter(
-                "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
-            ))
-            self.logger.addHandler(handler)
-            self.logger.setLevel(logging.INFO)
+        self.logger.setLevel(logging.INFO)
+        self.logger.propagate = True
 
-        self.logger.info("Init %s (platform=%s)", self.__class__.__name__, self.platform)
-
-    # ---------------- Locator resolution ----------------
+        # ---------------- Locator resolution ----------------
     def loc(self, mapping_or_tuple: AnyLocator) -> Locator:
         """
         Accepts either:
@@ -63,6 +56,14 @@ class BasePage:
         loc = self.loc(locator)
         el = self.wait.until(EC.visibility_of_element_located(loc))
         return el.text
+
+    # TODO: This is a preparation for a dual platform back method, at the moment, I will use driver.back() for android
+    # def press_back(self):
+    #     if self.platform.startswith("android"):
+    #         self.logger.info("Pressing Android BACK button")
+    #         self.driver.press_keycode(AndroidKey.BACK)
+    #     else:
+    #         self.logger.warning("press_back() not implemented for platform: %s", self.platform)
 
     # ---------------- Checks ----------------
     def is_visible(self, locator: AnyLocator, timeout: int = 0) -> bool:

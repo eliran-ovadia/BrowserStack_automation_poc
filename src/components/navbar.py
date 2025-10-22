@@ -35,8 +35,10 @@ class NavBar:
     def tap_market(self):
         self.tap(self.market_button)
 
-    def tap_search(self):
-        self.tap(self.search_button)
+    # I commented this method, because the search locator is not consistent across all pages that utilize it
+    # TODO: Request an accessibility id or a test-tag to have an explicit locator for the search button
+    # def tap_search(self):
+    #     self.tap(self.search_button)
 
     def tap_orders(self):
         self.tap(self.orders_button)

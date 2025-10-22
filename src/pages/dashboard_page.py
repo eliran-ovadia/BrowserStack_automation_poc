@@ -52,7 +52,7 @@ class DashboardPage(BasePage):
             "ios": ("", "")
         }
 
-    def nav_trade(self):
+    def nav_trade_portfolio(self):
         """
         We relay on the "My Portfolio" text to enter trade.
         When we cannot enter Trade, we get a different text such as "go to nextgen" ect...
