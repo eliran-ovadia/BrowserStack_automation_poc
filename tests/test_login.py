@@ -10,4 +10,4 @@ class TestLogin:
     @pytest.mark.smoke
     def test_moving_between_pages(self, set_web_driver):
         pf = PageFactory(set_web_driver)
-        portfolio = LoginFlow(set_web_driver, pf).enter_trade_with_credentials()
+        portfolio = LoginFlow(set_web_driver, pf).enter_trade_with_credentials().enter_portfolio_analysis()

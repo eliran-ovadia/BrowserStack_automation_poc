@@ -60,7 +60,7 @@ class DashboardPage(BasePage):
         self.tap(self.trade_portfolio_button)
 
     def nav_demo(self):  # Capabilities demonstration only
-        self.scroll_to_and_tap_locator(self.demo_portfolio_button, horizontal=True)
+        self.scroll_to_and_click_locator(self.demo_portfolio_button, horizontal=True)
 
     def nav_profile(self):
         self.tap(self.profile_button)
