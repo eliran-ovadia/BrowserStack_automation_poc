@@ -111,37 +111,30 @@ class BasePage:
         return self.driver.find_element(*scrollable)
 
     # TODO: refactor this function to utilize a loop to swipe and check for element on the screen
-    def scroll_until_found(self, to_locator: AnyLocator, scroll_locator: AnyLocator, horizontal: bool = False) -> WebElement:
-        """
-        Scrolls until a UiAutomator2 locator is brought into view; returns the found element.
-        NOTE: to_locator MUST be (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector()...')
-        """
-        self._ensure_android()
-        loc = self.loc(to_locator)
-        scroll_loc = self.loc(scroll_locator)
-        if loc[0] != AppiumBy.ANDROID_UIAUTOMATOR or "new UiSelector()" not in loc[1]:
-            raise ValueError(
-                "scroll_to_locator requires an ANDROID_UIAUTOMATOR locator with a 'new UiSelector()' expression"
-            )
-        self.logger.info("scroll_to_locator: %s (horizontal=%s)", loc, horizontal)
-        scrollable = (
-            AppiumBy.ANDROID_UIAUTOMATOR,
-            f'new UiScrollable({scroll_loc[1]})'
-            + '.scrollForward(3)'
-            + (".setAsHorizontalList()" if horizontal else "")
-            + f".scrollIntoView({loc[1]})"
-        )
-        # flag: bool = False
-        # element = None
-        # while not flag:
-        #     try:
-        #         element = self.driver.find_element(*scrollable)
-        #         flag = True
-        #     except NoSuchElementException:
-        #         print("No element found, keep scrolling....")
+    def scroll_until_found(self, to_locator: AnyLocator, scroll_locator: AnyLocator, horizontal: bool = False, max_swipes: int = 10) -> WebElement:
+        # First, we take the locators themselves from the tuple of each AnyLocator
+        locator = self.loc(to_locator)
+        scroll_locator = self.loc(scroll_locator)
 
-        element = self.driver.find_element(*scrollable)
-        return element
+        # We will loop the maximum amount of swipes, every time we cannot find the locator, we will scroll the page
+        for i in range(max_swipes):
+            try:
+                return self.driver.find_element(*locator)
+            except NoSuchElementException:
+                if self.platform == "android":
+                    # Perform a swipe up for Android
+                    size = self.driver.get_window_size()
+                    start_y = size['height'] * 0.8
+                    end_y = size['height'] * 0.2
+                    center_x = size['width'] * 0.5
+                    self.driver.swipe(center_x, start_y, center_x, end_y, 800)
+                elif self.platform == "ios":
+                    # Use mobile:scroll gesture for iOS
+                    params = {"direction": "down", "distance": 0.5}
+                    self.driver.execute_script("mobile: scroll", params)
+
+        # We raise if we scrolled the maximum amount but have not fond the locator
+        raise NoSuchElementException(f"Element with locator {locator} not found after {max_swipes} swipes.")
 
     def scroll_to_and_click_text(self, text: str, scroll_locator: AnyLocator, horizontal: bool = False) -> None:
         self.scroll_to_text(text, scroll_locator, horizontal).click()
