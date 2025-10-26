@@ -110,31 +110,62 @@ class BasePage:
         )
         return self.driver.find_element(*scrollable)
 
-    # TODO: refactor this function to utilize a loop to swipe and check for element on the screen
-    def scroll_until_found(self, to_locator: AnyLocator, scroll_locator: AnyLocator, horizontal: bool = False, max_swipes: int = 10) -> WebElement:
-        # First, we take the locators themselves from the tuple of each AnyLocator
-        locator = self.loc(to_locator)
-        scroll_locator = self.loc(scroll_locator)
+    def scroll_until_found(
+            self,
+            hidden_locator: AnyLocator,
+            scroll_locator: AnyLocator,
+            horizontal: bool = False,
+            max_swipes: int = 10
+    ) -> WebElement:
+        """
+        Scrolls a specific element until a target locator is found.
+        :param hidden_locator: The locator for the element to be found.
+        :param scroll_locator: The locator for the scrollable container.
+        :param horizontal: Boolean flag to enable horizontal scrolling.
+        :param max_swipes: Maximum number of swipe attempts.
+        :return: The found WebElement.
+        :raises NoSuchElementException: If the element is not found after max_swipes.
+        """
+        # First, get the locator values from the tuples
+        target_locator = self.loc(hidden_locator)
+        scrollable_element_locator = self.loc(scroll_locator)
 
-        # We will loop the maximum amount of swipes, every time we cannot find the locator, we will scroll the page
+        # Get the scrollable element once
+        scrollable_element = self.driver.find_element(*scrollable_element_locator)
+        scroll_area_size = scrollable_element.size
+        scroll_area_location = scrollable_element.location
+
+        # Determine swipe coordinates based on the scrollable element's dimensions
+        if horizontal:
+            start_x = scroll_area_location['x'] + scroll_area_size['width'] * 0.8
+            end_x = scroll_area_location['x'] + scroll_area_size['width'] * 0.2
+            y = scroll_area_location['y'] + scroll_area_size['height'] * 0.5
+            start_y = end_y = y  # Vertical position remains constant
+        else:  # Vertical scrolling
+            x = scroll_area_location['x'] + scroll_area_size['width'] * 0.5
+            start_y = scroll_area_location['y'] + scroll_area_size['height'] * 0.8
+            end_y = scroll_area_location['y'] + scroll_area_size['height'] * 0.2
+            start_x = end_x = x  # Horizontal position remains constant
+
+        # Loop and attempt to find the element
         for i in range(max_swipes):
             try:
-                return self.driver.find_element(*locator)
+                return self.driver.find_element(*target_locator)
             except NoSuchElementException:
                 if self.platform == "android":
-                    # Perform a swipe up for Android
-                    size = self.driver.get_window_size()
-                    start_y = size['height'] * 0.8
-                    end_y = size['height'] * 0.2
-                    center_x = size['width'] * 0.5
-                    self.driver.swipe(center_x, start_y, center_x, end_y, 800)
+                    self.driver.swipe(start_x, start_y, end_x, end_y, 800)
                 elif self.platform == "ios":
-                    # Use mobile:scroll gesture for iOS
-                    params = {"direction": "down", "distance": 0.5}
+                    # For iOS, use the 'mobile:scroll' gesture which can be more reliable.
+                    # However, for scrolling a specific element, the W3C Actions API is better.
+                    # This example uses a simplified approach for demonstration.
+                    params = {
+                        "direction": "left" if horizontal else "down",
+                        "element": scrollable_element.id
+                    }
                     self.driver.execute_script("mobile: scroll", params)
 
-        # We raise if we scrolled the maximum amount but have not fond the locator
-        raise NoSuchElementException(f"Element with locator {locator} not found after {max_swipes} swipes.")
+        # If the loop finishes without finding the element, raise an exception
+        raise NoSuchElementException(f"Element with locator {target_locator} not found after {max_swipes} swipes.")
 
     def scroll_to_and_click_text(self, text: str, scroll_locator: AnyLocator, horizontal: bool = False) -> None:
         self.scroll_to_text(text, scroll_locator, horizontal).click()
