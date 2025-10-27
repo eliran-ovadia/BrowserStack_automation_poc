@@ -1,5 +1,5 @@
 import logging
-from typing import Tuple, Union, Dict
+from typing import Tuple, Union, Dict, Any
 
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.webdriver import WebDriver
@@ -91,40 +91,42 @@ class BasePage:
     # ---------------- Scrolling ----------------
     def scroll_until_found(
             self,
-            hidden_locator: AnyLocator,
+            to_locator: AnyLocator,
             scroll_locator: AnyLocator,
             horizontal: bool = False,
+            opposite: bool = False,
             max_swipes: int = 10
     ) -> WebElement:
         """
         Scrolls a specific element until a target locator is found.
-        :param hidden_locator: The locator for the element to be found.
+        :param to_locator: The locator for the element to be found.
         :param scroll_locator: The locator for the scrollable container.
         :param horizontal: Boolean flag to enable horizontal scrolling.
+        :param opposite: Boolean flag to scroll in the opposite direction.
         :param max_swipes: Maximum number of swipe attempts.
         :return: The found WebElement.
         :raises NoSuchElementException: If the element is not found after max_swipes.
         """
-        # First, get the locator values from the tuples
-        target_locator = self.loc(hidden_locator)
+        target_locator = self.loc(to_locator)
         scrollable_element_locator = self.loc(scroll_locator)
 
-        # Get the scrollable element once
         scrollable_element = self.wait_for_presence(scrollable_element_locator)
         scroll_area_size = scrollable_element.size
         scroll_area_location = scrollable_element.location
 
-        # Determine swipe coordinates based on the scrollable element's dimensions
+        # Determine swipe coordinates based on the scrollable element's dimensions and direction
         if horizontal:
-            start_x = scroll_area_location['x'] + scroll_area_size['width'] * 0.8
-            end_x = scroll_area_location['x'] + scroll_area_size['width'] * 0.2
-            y = scroll_area_location['y'] + scroll_area_size['height'] * 0.5
-            start_y = end_y = y  # Vertical position remains constant
+            # Default scroll is right-to-left (content scrolls left), so start_x > end_x
+            start_x = scroll_area_location['x'] + scroll_area_size['width'] * (0.2 if opposite else 0.8)
+            end_x = scroll_area_location['x'] + scroll_area_size['width'] * (0.8 if opposite else 0.2)
+            start_y = scroll_area_location['y'] + scroll_area_size['height'] * 0.5
+            end_y = start_y
         else:  # Vertical scrolling
-            x = scroll_area_location['x'] + scroll_area_size['width'] * 0.5
-            start_y = scroll_area_location['y'] + scroll_area_size['height'] * 0.8
-            end_y = scroll_area_location['y'] + scroll_area_size['height'] * 0.2
-            start_x = end_x = x  # Horizontal position remains constant
+            # Default scroll is bottom-to-top (content scrolls up), so start_y > end_y
+            start_y = scroll_area_location['y'] + scroll_area_size['height'] * (0.2 if opposite else 0.8)
+            end_y = scroll_area_location['y'] + scroll_area_size['height'] * (0.8 if opposite else 0.2)
+            start_x = scroll_area_location['x'] + scroll_area_size['width'] * 0.5
+            end_x = start_x
 
         # Loop and attempt to find the element
         for i in range(max_swipes):
@@ -132,19 +134,21 @@ class BasePage:
                 return self.driver.find_element(*target_locator)
             except NoSuchElementException:
                 if self.platform == "android":
-                    self.driver.swipe(start_x, start_y, end_x, end_y, 800)
+                    self.driver.swipe(start_x, start_y, end_x, end_y, 200)
                 elif self.platform == "ios":
-                    # For iOS, use the 'mobile:scroll' gesture which can be more reliable.
-                    # However, for scrolling a specific element, the W3C Actions API is better.
-                    # This example uses a simplified approach for demonstration.
-                    params = {
-                        "direction": "left" if horizontal else "down",
-                        "element": scrollable_element.id
+                    direction = ""
+                    if horizontal:
+                        direction = "right" if opposite else "left"
+                    else:
+                        direction = "up" if opposite else "down"
+
+                    params: Dict[str, Any] = {
+                        "direction": direction,
+                        "elementId": scrollable_element.id
                     }
                     self.driver.execute_script("mobile: scroll", params)
 
-        # If the loop finishes without finding the element, raise an exception
         raise NoSuchElementException(f"Element with locator {target_locator} not found after {max_swipes} swipes.")
 
-    def scroll_to_and_click_locator(self, to_locator: AnyLocator, scroll_locator: AnyLocator, horizontal: bool = False) -> None:
-        self.scroll_until_found(to_locator, scroll_locator, horizontal).click()
+    def scroll_to_and_click_locator(self, to_locator: AnyLocator, scroll_locator: AnyLocator, horizontal: bool = False, opposite = False) -> None:
+        self.scroll_until_found(to_locator, scroll_locator, horizontal, opposite).click()

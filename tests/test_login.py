@@ -15,4 +15,6 @@ class TestLogin:
 
     def test_go_to_demo(self, set_web_driver):
         pf = PageFactory(set_web_driver)
-        dashboard = LoginFlow(set_web_driver, pf).login_with_credentials().nav_demo()
+        dashboard = LoginFlow(set_web_driver, pf).login_with_credentials()
+        dashboard.nav_demo()
+

@@ -42,6 +42,7 @@ class DashboardPage(BasePage):
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Currency Exchange")'),
             "ios": ("", "")
         }
+
         # --------------------Demo card ----------------------
         self.in_card_demo_title = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Demo Trading").instance(0)'),
