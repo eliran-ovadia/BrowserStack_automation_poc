@@ -1,11 +1,10 @@
 import logging
-from typing import Tuple, Union, Dict
+from typing import Tuple, Union, Dict, Any
 
 from appium.webdriver.common.appiumby import AppiumBy
-from appium.webdriver.extensions.android.nativekey import AndroidKey
 from appium.webdriver.webdriver import WebDriver
 from appium.webdriver.webelement import WebElement
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -75,65 +74,81 @@ class BasePage:
         except TimeoutException:
             return False
 
-    def is_present(self, locator: AnyLocator, timeout: int = 0) -> bool:
+    def wait_for_presence(self, locator: AnyLocator, timeout: int = 0) -> WebElement | bool:
         loc = self.loc(locator)
         try:
-            (self.wait if timeout == 0 else WebDriverWait(self.driver, timeout)) \
-                .until(EC.presence_of_element_located(loc))
-            return True
+            return self.wait.until(EC.presence_of_element_located(loc))
         except TimeoutException:
             return False
 
-    def wait_gone(self, locator: AnyLocator) -> bool:
+    def wait_gone(self, locator: AnyLocator) -> WebElement | bool:
         loc = self.loc(locator)
         try:
             return self.wait.until(EC.invisibility_of_element_located(loc))
         except TimeoutException:
             return False
 
-    # ---------------- Scrolling (Android UiScrollable) ----------------
-    def _ensure_android(self):
-        if not self.platform.startswith("android"):
-            raise NotImplementedError("UiScrollable is Android-only")
-
-    def scroll_to_text(self, text: str, horizontal: bool = False) -> WebElement:
+    # ---------------- Scrolling ----------------
+    def scroll_until_found(
+            self,
+            to_locator: AnyLocator,
+            scroll_locator: AnyLocator,
+            horizontal: bool = False,
+            opposite: bool = False,
+            max_swipes: int = 10
+    ) -> WebElement:
         """
-        Scrolls until a view with exact text() is visible; returns the found element.
-        Android only.
+        Scrolls a specific element until a target locator is found.
+        :param to_locator: The locator for the element to be found.
+        :param scroll_locator: The locator for the scrollable container.
+        :param horizontal: Boolean flag to enable horizontal scrolling.
+        :param opposite: Boolean flag to scroll in the opposite direction.
+        :param max_swipes: Maximum number of swipe attempts.
+        :return: The found WebElement.
+        :raises NoSuchElementException: If the element is not found after max_swipes.
         """
-        self._ensure_android()
-        self.logger.info("scroll_to_text: %r (horizontal=%s)", text, horizontal)
-        scrollable = (
-            AppiumBy.ANDROID_UIAUTOMATOR,
-            "new UiScrollable(new UiSelector().scrollable(true))"
-            + (".setAsHorizontalList()" if horizontal else "")
-            + f'.scrollIntoView(new UiSelector().text("{text}"))'
-        )
-        return self.driver.find_element(*scrollable)
+        target_locator = self.loc(to_locator)
+        scrollable_element_locator = self.loc(scroll_locator)
 
-    def scroll_to_locator(self, to_locator: AnyLocator, horizontal: bool = False) -> WebElement:
-        """
-        Scrolls until a UiAutomator2 locator is brought into view; returns the found element.
-        NOTE: to_locator MUST be (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector()...')
-        """
-        self._ensure_android()
-        loc = self.loc(to_locator)
-        if loc[0] != AppiumBy.ANDROID_UIAUTOMATOR or "new UiSelector()" not in loc[1]:
-            raise ValueError(
-                "scroll_to_locator requires an ANDROID_UIAUTOMATOR locator with a 'new UiSelector()' expression"
-            )
-        self.logger.info("scroll_to_locator: %s (horizontal=%s)", loc, horizontal)
-        scrollable = (
-            AppiumBy.ANDROID_UIAUTOMATOR,
-            "new UiScrollable(new UiSelector().scrollable(true))"
-            + (".setAsHorizontalList()" if horizontal else "")
-            + f".scrollIntoView({loc[1]})"
-        )
-        # Execute the UiScrollable expression and return the element that was brought into view
-        return self.driver.find_element(*scrollable)
+        scrollable_element = self.wait_for_presence(scrollable_element_locator)
+        scroll_area_size = scrollable_element.size
+        scroll_area_location = scrollable_element.location
 
-    def scroll_to_and_tap_text(self, text: str, horizontal: bool = False) -> None:
-        self.scroll_to_text(text, horizontal).click()
+        # Determine swipe coordinates based on the scrollable element's dimensions and direction
+        if horizontal:
+            # Default scroll is right-to-left (content scrolls left), so start_x > end_x
+            start_x = scroll_area_location['x'] + scroll_area_size['width'] * (0.2 if opposite else 0.8)
+            end_x = scroll_area_location['x'] + scroll_area_size['width'] * (0.8 if opposite else 0.2)
+            start_y = scroll_area_location['y'] + scroll_area_size['height'] * 0.5
+            end_y = start_y
+        else:  # Vertical scrolling
+            # Default scroll is bottom-to-top (content scrolls up), so start_y > end_y
+            start_y = scroll_area_location['y'] + scroll_area_size['height'] * (0.2 if opposite else 0.8)
+            end_y = scroll_area_location['y'] + scroll_area_size['height'] * (0.8 if opposite else 0.2)
+            start_x = scroll_area_location['x'] + scroll_area_size['width'] * 0.5
+            end_x = start_x
 
-    def scroll_to_and_tap_locator(self, to_locator: AnyLocator, horizontal: bool = False) -> None:
-        self.scroll_to_locator(to_locator, horizontal).click()
+        # Loop and attempt to find the element
+        for i in range(max_swipes):
+            try:
+                return self.driver.find_element(*target_locator)
+            except NoSuchElementException:
+                if self.platform == "android":
+                    self.driver.swipe(start_x, start_y, end_x, end_y, 200)
+                elif self.platform == "ios":
+                    direction = ""
+                    if horizontal:
+                        direction = "right" if opposite else "left"
+                    else:
+                        direction = "up" if opposite else "down"
+
+                    params: Dict[str, Any] = {
+                        "direction": direction,
+                        "elementId": scrollable_element.id
+                    }
+                    self.driver.execute_script("mobile: scroll", params)
+
+        raise NoSuchElementException(f"Element with locator {target_locator} not found after {max_swipes} swipes.")
+
+    def scroll_to_and_click_locator(self, to_locator: AnyLocator, scroll_locator: AnyLocator, horizontal: bool = False, opposite = False) -> None:
+        self.scroll_until_found(to_locator, scroll_locator, horizontal, opposite).click()
