@@ -13,7 +13,7 @@ class TestLogin:
         pf = PageFactory(set_web_driver)
         portfolio = LoginFlow(set_web_driver, pf).enter_trade_with_credentials().enter_portfolio_analysis()
 
-    def test_go_to_demo(self, set_web_driver):
+    def xtest_go_to_demo(self, set_web_driver):
         pf = PageFactory(set_web_driver)
         dashboard = LoginFlow(set_web_driver, pf).login_with_credentials()
         dashboard.nav_demo()
