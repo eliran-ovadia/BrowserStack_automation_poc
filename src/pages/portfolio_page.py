@@ -1,7 +1,7 @@
 from appium.webdriver.common.appiumby import AppiumBy
 
 from src.components.navbar import NavBar
-from src.components.more_actions import MoreActions
+from src.components.top_menu_shutter import TopMenuShutter
 from src.pages.base_page import BasePage
 
 
@@ -10,7 +10,7 @@ class PortfolioPage(BasePage):
         super().__init__(driver)
         self.driver = driver
         self.navbar = NavBar(self.tap)
-        self.more_actions = MoreActions(self.tap)
+        self.more_actions = TopMenuShutter(self.tap)
         # Locators -----------------
         self.scroll_view = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().className("android.widget.ScrollView")'),

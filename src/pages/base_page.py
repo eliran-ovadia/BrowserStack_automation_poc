@@ -98,7 +98,7 @@ class BasePage:
             max_swipes: int = 10
     ) -> WebElement:
         """
-        Scrolls a specific element until a target locator is found.
+        Scrolls a specific element until a target locator is found using modern W3C gestures.
         :param to_locator: The locator for the element to be found.
         :param scroll_locator: The locator for the scrollable container.
         :param horizontal: Boolean flag to enable horizontal scrolling.
@@ -110,44 +110,41 @@ class BasePage:
         target_locator = self.loc(to_locator)
         scrollable_element_locator = self.loc(scroll_locator)
 
+        # Use wait_for_presence here, assuming it's a method in your BasePage that returns the element
         scrollable_element = self.wait_for_presence(scrollable_element_locator)
-        scroll_area_size = scrollable_element.size
-        scroll_area_location = scrollable_element.location
 
-        # Determine swipe coordinates based on the scrollable element's dimensions and direction
+        # Determine the direction string for modern gestures
+        direction = ""
         if horizontal:
-            # Default scroll is right-to-left (content scrolls left), so start_x > end_x
-            start_x = scroll_area_location['x'] + scroll_area_size['width'] * (0.2 if opposite else 0.8)
-            end_x = scroll_area_location['x'] + scroll_area_size['width'] * (0.8 if opposite else 0.2)
-            start_y = scroll_area_location['y'] + scroll_area_size['height'] * 0.5
-            end_y = start_y
-        else:  # Vertical scrolling
-            # Default scroll is bottom-to-top (content scrolls up), so start_y > end_y
-            start_y = scroll_area_location['y'] + scroll_area_size['height'] * (0.2 if opposite else 0.8)
-            end_y = scroll_area_location['y'] + scroll_area_size['height'] * (0.8 if opposite else 0.2)
-            start_x = scroll_area_location['x'] + scroll_area_size['width'] * 0.5
-            end_x = start_x
+            direction = "right" if opposite else "left"
+        else:
+            direction = "down" if opposite else "up"
 
         # Loop and attempt to find the element
         for i in range(max_swipes):
             try:
-                return self.driver.find_element(*target_locator)
+                # Try finding the target element within the scrollable element's context
+                return scrollable_element.find_element(*target_locator)
             except NoSuchElementException:
+                # If not found, execute the modern Appium gesture
                 if self.platform == "android":
-                    self.driver.swipe(start_x, start_y, end_x, end_y, 200)
+                    # Use mobile:swipeGesture for Android (can control speed/percent)
+                    params: Dict[str, Any] = {
+                        "direction": direction,
+                        "elementId": scrollable_element.id,
+                        "percent": 0.7,  # Swipe through 50% of the element
+                        "speed": 1500  # Duration of 500ms
+                    }
+                    self.driver.execute_script("mobile: swipeGesture", params)
                 elif self.platform == "ios":
-                    direction = ""
-                    if horizontal:
-                        direction = "right" if opposite else "left"
-                    else:
-                        direction = "up" if opposite else "down"
-
+                    # Use mobile:scroll for iOS (simpler, element-specific)
                     params: Dict[str, Any] = {
                         "direction": direction,
                         "elementId": scrollable_element.id
                     }
                     self.driver.execute_script("mobile: scroll", params)
 
+        # If the loop finishes without finding the element, raise an exception
         raise NoSuchElementException(f"Element with locator {target_locator} not found after {max_swipes} swipes.")
 
     def scroll_to_and_click_locator(self, to_locator: AnyLocator, scroll_locator: AnyLocator, horizontal: bool = False, opposite = False) -> None:

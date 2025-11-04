@@ -1,7 +1,7 @@
 from appium.webdriver.common.appiumby import AppiumBy
 
 
-class MoreActions:
+class TopMenuShutter:
     """More actions pull down menu in Trade - contain: Fund My Account, Withdrawal, Credit, Currency Exchange,
         More Self Service Options, Price Alerts, Recurring Investment"""
     def __init__(self, tap_fn):
