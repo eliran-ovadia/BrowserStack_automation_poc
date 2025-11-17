@@ -3,19 +3,21 @@ import os
 from appium.webdriver.common.appiumby import AppiumBy
 
 from src.pages.base_page import BasePage
+from src.services.get_strings import get_strings
 
 
 class WelcomePage(BasePage):
     def __init__(self, driver):
         super().__init__(driver)
         self.username = os.getenv("USER")
+        strings = get_strings("dashboard_profile")
         # Locators ----------------------
         self.username_field = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().className("android.widget.EditText")'),
             "ios": ("", "")
         }
         self.login_button = {
-            "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Login")'),
+            "android": (AppiumBy.XPATH, '//android.widget.TextView[@text="Login"]'),
             "ios": ("", "")
         }
 

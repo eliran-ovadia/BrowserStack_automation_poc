@@ -58,11 +58,4 @@ def get_strings(page: str):
 
 if __name__ == "__main__":
     print("--- Fetching Main Page (first time) ---")
-    print(json.dumps(get_strings(page="main"), indent=4, ensure_ascii=False))
-
-    print("\n--- Fetching Portfolio Page (first time) ---")
-    print(json.dumps(get_strings(page="portfolio"), indent=4, ensure_ascii=False))
-
-    print("\n--- Fetching Main Page (second time) ---")
-    print("This should be served from @lru_cache")
-    print(json.dumps(get_strings(page="main"), indent=4, ensure_ascii=False))
+    print(json.dumps(get_strings(page="dashboard_login"), indent=4, ensure_ascii=False))
