@@ -5,3 +5,4 @@ browserstack-sdk
 appium-python-client
 pytest-selenium
 selenium
+requests
