@@ -13,4 +13,4 @@ class OtpPage(BasePage):
         }
 
     def tap_login_with_password(self):
-        self.tap(self.login_with_password_button)
+        self.wait_and_click(self.login_with_password_button)

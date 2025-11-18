@@ -1,11 +1,13 @@
 from appium.webdriver.common.appiumby import AppiumBy
+from src.pages.base_page import BasePage
 
 
-class NavBar:
+class NavBar(BasePage):
     """Bottom navigation bar for Trade bottom section (portfolio, market, search, orders, knowledge"""
 
-    def __init__(self, tap_fn):
-        self.tap = tap_fn
+    def __init__(self, driver):
+        super().__init__(driver)
+        self.driver = driver
         # --- Locators ---------------------
         self.portfolio_button = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Portfolio")'),
@@ -15,11 +17,11 @@ class NavBar:
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Market")'),
             "ios": ("", "")
         }
-        self.search_button = {
-            "android": (AppiumBy.ANDROID_UIAUTOMATOR,
-                        'new UiSelector().className("android.widget.Button").instance(4)'),
-            "ios": ("", "")
-        }
+        # self.search_button = {
+        #     "android": (AppiumBy.ANDROID_UIAUTOMATOR,
+        #                 'new UiSelector().className("android.widget.Button").instance(4)'),
+        #     "ios": ("", "")
+        # }
         self.orders_button = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Orders")'),
             "ios": ("", "")
@@ -30,18 +32,19 @@ class NavBar:
         }
 
     def tap_portfolio(self):
-        self.tap(self.portfolio_button)
+        self.wait_and_click(self.portfolio_button)
 
     def tap_market(self):
-        self.tap(self.market_button)
+        self.wait_and_click(self.market_button)
 
     # I commented this method, because the search locator is not consistent across all pages that utilize it
     # TODO: Request an accessibility id or a test-tag to have an explicit locator for the search button
-    # def tap_search(self):
-    #     self.tap(self.search_button)
+    def tap_search(self):
+        self.wait_for_presence(self.market_button)
+        self.tap_coordinates([0.5, 0.90]) # The search button is always at the same place (relative)
 
     def tap_orders(self):
-        self.tap(self.orders_button)
+        self.wait_and_click(self.orders_button)
 
     def tap_knowledge(self):
-        self.tap(self.knowledge_button)
+        self.wait_and_click(self.knowledge_button)

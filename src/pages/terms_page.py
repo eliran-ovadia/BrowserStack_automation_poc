@@ -19,7 +19,7 @@ class TermsPage(BasePage):
         }
 
     def accept_terms(self):
-        self.tap(self.accept_button)
+        self.wait_and_click(self.accept_button)
 
     def reject_terms(self):
-        self.tap(self.reject_button)
+        self.wait_and_click(self.reject_button)

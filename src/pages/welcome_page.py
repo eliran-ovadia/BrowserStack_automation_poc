@@ -27,5 +27,5 @@ class WelcomePage(BasePage):
         return self
 
     def tap_welcome_login(self):
-        self.tap(self.login_button)
+        self.wait_and_click(self.login_button)
         self.logger.info(f"Tapped login button")
