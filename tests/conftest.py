@@ -19,8 +19,10 @@ dotenv.load_dotenv()
 local_caps = {
     "platformName": "Android",
     "appium:automationName": "UiAutomator2",
-    "appium:udid": "RF8M21KVM1K",
-    "appium:platformVersion": "12",
+    #"appium:udid": "RF8M21KVM1K",
+    "appium:udid": "emulator-5554",
+    #"appium:platformVersion": "12",
+    "appium:platformVersion": "16",
     "appium:deviceName": "Galaxy S10",
     "appium:appPackage": "com.ibidev.ibitrade",
     "appium:appActivity": "com.ibidev.ibitrade.MainActivity",
