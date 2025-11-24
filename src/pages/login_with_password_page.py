@@ -16,11 +16,11 @@ class LoginWithPasswordPage(BasePage):
         }
         self.password_input_field = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().className("android.widget.EditText")'),
-            "ios": ("", "")
+            "ios": (AppiumBy.XPATH, '//XCUIElementTypeTextField[@value="input your password"]')
         }
         self.login_button = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Login")'),
-            "ios": ("", "")
+            "ios": (AppiumBy.XPATH, '//XCUIElementTypeStaticText[@name="Login"]')
         }
 
     def enter_password(self):

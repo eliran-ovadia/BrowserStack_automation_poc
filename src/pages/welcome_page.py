@@ -2,8 +2,8 @@ import os
 
 from appium.webdriver.common.appiumby import AppiumBy
 
+from src.api_utils.get_strings import get_strings
 from src.pages.base_page import BasePage
-from src.api_utils.api_auth import get_strings
 
 
 class WelcomePage(BasePage):
@@ -14,11 +14,11 @@ class WelcomePage(BasePage):
         # Locators ----------------------
         self.username_field = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().className("android.widget.EditText")'),
-            "ios": ("", "")
+            "ios": (AppiumBy.XPATH, '//XCUIElementTypeTextField[@value="Email or Username"]')
         }
         self.login_button = {
             "android": (AppiumBy.XPATH, '//android.widget.TextView[@text="Login"]'),
-            "ios": ("", "")
+            "ios": (AppiumBy.XPATH, '//XCUIElementTypeStaticText[@name="Log In"]')
         }
 
     def enter_username(self):

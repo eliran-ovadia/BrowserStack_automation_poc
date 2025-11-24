@@ -9,7 +9,7 @@ class OtpPage(BasePage):
         # Locators ----------------------
         self.login_with_password_button = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Login with Password")'),
-            "ios": ("", "")
+            "ios": (AppiumBy.XPATH, '//XCUIElementTypeStaticText[@name="Login with Password"]')
         }
 
     def tap_login_with_password(self):

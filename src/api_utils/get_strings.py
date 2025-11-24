@@ -2,7 +2,7 @@ import os
 from functools import lru_cache
 from src.api_utils.api_auth import handle_request
 import dotenv
-from create_session import SESSION
+from src.api_utils.create_session import SESSION
 
 dotenv.load_dotenv()
 BASE_URL = os.getenv("BASE_URL")

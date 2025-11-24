@@ -6,11 +6,13 @@ class LoginFlow(BaseFlow):
     def __init__(self, driver, factory: PageFactory | None = None):
         super().__init__(driver)
         self.driver = driver
+        self.platform = (driver.capabilities.get("platformName") or "").lower()
         self.pf = factory or PageFactory(driver)
 
     def login_with_credentials(self):
-        terms = self.pf.terms()
-        terms.accept_terms()
+        if self.platform == "android":
+            terms = self.pf.terms()
+            terms.accept_terms()
 
         welcome = self.pf.welcome()
         welcome.enter_username()

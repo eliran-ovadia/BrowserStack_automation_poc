@@ -11,7 +11,7 @@ class PortfolioPage(BasePage):
         # Locators -----------------
         self.scroll_view = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().className("android.widget.ScrollView")'),
-            "ios": ("", "")
+            "ios": (AppiumBy.XPATH, '//XCUIElementTypeTable')
         }
         self.home_button = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().className("android.widget.Button").instance(1)'),
@@ -23,7 +23,7 @@ class PortfolioPage(BasePage):
         }
         self.portfolio_analysis_show_me_button = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Show me")'),
-            "ios": ("", "")
+            "ios": (AppiumBy.XPATH, '//XCUIElementTypeStaticText[@name="Show me"]')
         }
         # --------------------------
 

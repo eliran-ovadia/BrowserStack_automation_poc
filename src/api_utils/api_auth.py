@@ -6,9 +6,9 @@ import os
 import dotenv
 import json
 from src.api_utils.create_session import SESSION
-from endpoint_models.oauth_token import OauthToken
-from endpoint_models.dashboard_skip import DashboardSkip
-from endpoint_models.vt_sso_platform import VtSsoPlatform
+from src.api_utils.endpoint_models.oauth_token import OauthToken
+from src.api_utils.endpoint_models.dashboard_skip import DashboardSkip
+from src.api_utils.endpoint_models.vt_sso_platform import VtSsoPlatform
 
 dotenv.load_dotenv()
 API_KEY = os.getenv("API_KEY")

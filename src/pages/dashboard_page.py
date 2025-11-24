@@ -28,7 +28,7 @@ class DashboardPage(BasePage):
         }
         self.trade_portfolio_button = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("My Portfolio")'),
-            "ios": ("", "")
+            "ios": (AppiumBy.XPATH, '//XCUIElementTypeStaticText[@name="My Portfolio"]')
         }
         self.fund_my_account_button_text = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Fund My Account")'),

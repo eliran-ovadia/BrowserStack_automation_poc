@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import Tuple, Union, Dict, Any
 
 from appium.webdriver.webdriver import WebDriver
