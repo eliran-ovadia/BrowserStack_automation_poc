@@ -3,7 +3,7 @@
 class DashboardSkip:
     def __init__(self, **kwargs):
         self._vtToken = kwargs.get("vtToken")
-        self._fmToken = kwargs.get("fmToken")
+        self._fmToken = kwargs.get("fmrToken")
         self._connectionToken = kwargs.get("connectionToken")
 
     def get_vtToken(self):

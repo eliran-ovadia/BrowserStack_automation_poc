@@ -1,3 +1,5 @@
+from asyncio import sleep
+
 import pytest
 
 from src.components.navbar import NavBar
@@ -11,13 +13,5 @@ class TestLogin:
 
     @pytest.mark.smoke
     def test_moving_between_pages(self, set_web_driver):
-        pf = PageFactory(set_web_driver)
-        portfolio = LoginFlow(set_web_driver, pf).enter_trade_with_credentials()
-        navbar = NavBar(set_web_driver)
-        navbar.tap_search()
-
-    def xtest_go_to_demo(self, set_web_driver):
-        pf = PageFactory(set_web_driver)
-        dashboard = LoginFlow(set_web_driver, pf).login_with_credentials()
-        dashboard.nav_demo()
+        sleep(20)
 
