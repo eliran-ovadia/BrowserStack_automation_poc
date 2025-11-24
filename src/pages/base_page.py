@@ -1,10 +1,13 @@
 import logging
 from typing import Tuple, Union, Dict, Any
 
-from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.webdriver import WebDriver
 from appium.webdriver.webelement import WebElement
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver import ActionChains
+from selenium.webdriver.common.actions import interaction
+from selenium.webdriver.common.actions.action_builder import ActionBuilder
+from selenium.webdriver.common.actions.pointer_input import PointerInput
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -22,6 +25,7 @@ class BasePage:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.setLevel(logging.INFO)
         self.logger.propagate = True
+        self.window_size = None
 
         # ---------------- Locator resolution ----------------
     def loc(self, mapping_or_tuple: AnyLocator) -> Locator:
@@ -29,6 +33,7 @@ class BasePage:
         Accepts either:
           - {"android": (by, value), "ios": (by, value)}
           - (by, value)
+          - [point_x, point_y]
         """
         if isinstance(mapping_or_tuple, tuple):
             return mapping_or_tuple
@@ -37,11 +42,36 @@ class BasePage:
         return mapping_or_tuple["android"]
 
     # ---------------- Actions ----------------
-    def tap(self, locator: AnyLocator) -> None:
+    def wait_and_click(self, locator: AnyLocator) -> None:
         loc = self.loc(locator)
         self.logger.info("tap: %s", loc)
         el = self.wait.until(EC.element_to_be_clickable(loc))
         el.click()
+
+    def tap_coordinates(self, coordinates: list, relative_to_window=True):
+        if not self.window_size:
+            self.window_size = self.driver.get_window_size()
+
+        width = self.window_size['width']
+        height = self.window_size['height']
+
+        # 1. Safe Casting: Convert to float first to handle string inputs like "0.5", then int
+        if relative_to_window:
+            point_x = int(float(width) * float(coordinates[0]))
+            point_y = int(float(height) * float(coordinates[1]))
+        else:
+            point_x = int(float(coordinates[0]))
+            point_y = int(float(coordinates[1]))
+
+        print(f"Tapping at coordinates: X={point_x}, Y={point_y}")
+
+        actions = ActionChains(self.driver)
+        actions.w3c_actions = ActionBuilder(self.driver, mouse=PointerInput(interaction.POINTER_TOUCH, "touch"))
+        actions.w3c_actions.pointer_action.move_to_location(point_x, point_y)
+        actions.w3c_actions.pointer_action.pointer_down()
+        actions.w3c_actions.pointer_action.pause(0.1)
+        actions.w3c_actions.pointer_action.pointer_up()
+        actions.perform()
 
     def write(self, locator: AnyLocator, text: str, clear: bool = True) -> None:
         loc = self.loc(locator)
@@ -132,8 +162,8 @@ class BasePage:
                     params: Dict[str, Any] = {
                         "direction": direction,
                         "elementId": scrollable_element.id,
-                        "percent": 0.7,  # Swipe through 50% of the element
-                        "speed": 1500  # Duration of 500ms
+                        "percent": 0.9,  # Swipe through 50% of the element
+                        "speed": 3000  # Duration of 500ms
                     }
                     self.driver.execute_script("mobile: swipeGesture", params)
                 elif self.platform == "ios":

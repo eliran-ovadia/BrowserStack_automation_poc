@@ -29,5 +29,5 @@ class LoginWithPasswordPage(BasePage):
         return self
 
     def tap_password_login(self):
-        self.tap(self.login_button)
+        self.wait_and_click(self.login_button)
         self.logger.info("Tapped Login on password page")

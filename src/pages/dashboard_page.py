@@ -58,22 +58,22 @@ class DashboardPage(BasePage):
         We relay on the "My Portfolio" text to enter trade.
         When we cannot enter Trade, we get a different text such as "go to nextgen" ect...
         """
-        self.tap(self.trade_portfolio_button)
+        self.wait_and_click(self.trade_portfolio_button)
 
     def nav_demo(self):  # Capabilities demonstration only
         self.scroll_to_and_click_locator(self.demo_portfolio_button, self.dashboard_horizontal_scroll_view, horizontal=True)
 
     def nav_profile(self):
-        self.tap(self.profile_button)
+        self.wait_and_click(self.profile_button)
 
     def nav_settings(self):
-        self.tap(self.settings_button)
+        self.wait_and_click(self.settings_button)
 
     def nav_fund_my_account(self):
-        self.tap(self.fund_my_account_button_text)
+        self.wait_and_click(self.fund_my_account_button_text)
 
     def nav_invite_your_friend(self):
-        self.tap(self.invite_your_friend_button_text)
+        self.wait_and_click(self.invite_your_friend_button_text)
 
     def nav_currency_exchange(self):
-        self.tap(self.currency_exchange_button_text)
+        self.wait_and_click(self.currency_exchange_button_text)
