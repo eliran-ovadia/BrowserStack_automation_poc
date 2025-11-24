@@ -5,12 +5,10 @@ import requests
 import os
 import dotenv
 import json
-from functools import lru_cache
-from src.api_utils.create_session import create_session
+from src.api_utils.create_session import SESSION
 from endpoint_models.oauth_token import OauthToken
 from endpoint_models.dashboard_skip import DashboardSkip
 from endpoint_models.vt_sso_platform import VtSsoPlatform
-from endpoint_models.portfolio import PortfolioEndpoint
 
 dotenv.load_dotenv()
 API_KEY = os.getenv("API_KEY")
@@ -50,7 +48,7 @@ def handle_request(api_call: Callable[[], requests.Response], failure_context: s
 class ApiAuth:
     def __init__(self):
         self.base_url = BASE_URL
-        self.session = create_session()
+        self.session = SESSION
         self.auth0_access_token = None
         self.vt_sessionId = None
         self.vtToken = None
@@ -87,19 +85,6 @@ class ApiAuth:
         self._fetch_auth0_access_token()
         self._fetch_vt_sessionId()
         self._fetch_dashboard_skip()
-
-    @lru_cache(maxsize=None)
-    def get_strings(self, page: str):
-        url = f"{BASE_URL}/api/getStrings/{page}"
-        try:
-            response = self.session.get(url)
-            response.raise_for_status()
-            print(f"fetched strings for page {page} successfully")
-            return response.json()
-        except requests.exceptions.RequestException as e:
-            pytest.skip(f"Failed to fetch strings for {page} after retries: {e}")
-        except json.decoder.JSONDecodeError as e:
-            pytest.skip(f"Server returned invalid JSON for {page}: {e}")
 
 
 

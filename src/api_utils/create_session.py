@@ -21,3 +21,6 @@ def create_session() -> requests.Session:
     session.mount("https://", adapter)
 
     return session
+
+
+SESSION = create_session()
