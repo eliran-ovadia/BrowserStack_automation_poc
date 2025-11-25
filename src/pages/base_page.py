@@ -46,7 +46,7 @@ class BasePage:
     def wait_and_click(self, locator: AnyLocator) -> None:
         loc = self.loc(locator)
         self.logger.info("tap: %s", loc)
-        el = self.wait.until(EC.element_to_be_clickable(loc))
+        el = self.wait.until(EC.visibility_of_element_located(loc))
         el.click()
 
     def tap_coordinates(self, coordinates: list, relative_to_window=True):
