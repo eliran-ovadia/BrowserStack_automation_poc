@@ -1,4 +1,4 @@
-from asyncio import sleep
+from time import sleep
 
 import pytest
 
@@ -22,6 +22,3 @@ class TestLogin:
         dashboard = DashboardPage(set_web_driver).nav_trade_portfolio()
         portfolio = PortfolioPage(set_web_driver).enter_portfolio_analysis()
         sleep(10)
-
-
-

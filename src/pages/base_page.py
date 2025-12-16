@@ -163,7 +163,7 @@ class BasePage:
                     params: Dict[str, Any] = {
                         "direction": direction,
                         "elementId": scrollable_element.id,
-                        "percent": 0.9,  # Swipe through 50% of the element
+                        "percent": 0.8,  # Swipe through X percent of the element
                         "speed": 3000  # Duration of 500ms
                     }
                     self.driver.execute_script("mobile: swipeGesture", params)

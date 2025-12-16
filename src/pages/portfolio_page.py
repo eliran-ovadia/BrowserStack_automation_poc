@@ -10,7 +10,7 @@ class PortfolioPage(BasePage):
         self.more_actions = TopMenuShutter(self.wait_and_click)
         # Locators -----------------
         self.scroll_view = {
-            "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().className("android.widget.ScrollView")'),
+            "android": (AppiumBy.XPATH, '//e1.i0/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View[1]'),
             "ios": (AppiumBy.XPATH, '//XCUIElementTypeTable')
         }
         self.home_button = {
@@ -22,7 +22,7 @@ class PortfolioPage(BasePage):
             "ios": ("", "")
         }
         self.portfolio_analysis_show_me_button = {
-            "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Show me")'),
+            "android": (AppiumBy.XPATH, '//android.widget.TextView[@text="Show me"]'),
             "ios": (AppiumBy.XPATH, '//XCUIElementTypeStaticText[@name="Show me"]')
         }
         # --------------------------
