@@ -17,11 +17,10 @@ class NavBar(BasePage):
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Market")'),
             "ios": ("", "")
         }
-        # self.search_button = {
-        #     "android": (AppiumBy.ANDROID_UIAUTOMATOR,
-        #                 'new UiSelector().className("android.widget.Button").instance(4)'),
-        #     "ios": ("", "")
-        # }
+        self.search_button = {
+            "android": ('', ''),
+            "ios": (AppiumBy.XPATH, '//XCUIElementTypeImage[@name="ic_tab_bar_search"]')
+        }
         self.orders_button = {
             "android": (AppiumBy.ANDROID_UIAUTOMATOR, 'new UiSelector().text("Orders")'),
             "ios": ("", "")
@@ -41,7 +40,10 @@ class NavBar(BasePage):
     # TODO: Request an accessibility id or a test-tag to have an explicit locator for the search button
     def tap_search(self):
         self.wait_for_presence(self.market_button)
-        self.tap_coordinates([0.5, 0.90]) # The search button is always at the same place (relative)
+        if self.platform == "android":
+            self.tap_coordinates([0.5, 0.90]) # The search button is always at the same place (relative)
+        else:
+            self.wait_and_click(self.search_button)
 
     def tap_orders(self):
         self.wait_and_click(self.orders_button)
