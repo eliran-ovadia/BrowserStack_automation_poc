@@ -3,6 +3,7 @@ import os
 import dotenv
 import pytest
 from appium import webdriver
+from appium.webdriver.appium_service import AppiumService
 from appium.options.android import UiAutomator2Options
 from appium.options.ios import XCUITestOptions
 
@@ -47,14 +48,32 @@ ios_caps = {
     # "appium:xcodeSigningId": "iPhone Developer"
 }
 
-@pytest.fixture(scope="function")
-def set_web_driver(request):
+
+@pytest.fixture(scope="session")
+def set_web_driver(appium_server, request):
     if platform == "android":
         opts = UiAutomator2Options().load_capabilities(android_caps)
     else:
         opts = XCUITestOptions().load_capabilities(ios_caps)
 
+    # NOTE: appium_server fixture make sure we have appium client instance running
     driver = webdriver.Remote(command_executor="http://127.0.0.1:4723", options=opts)
 
     yield driver
     driver.quit()
+
+
+@pytest.fixture(scope="session")
+def appium_server():
+    print("Starting Appium Server...")
+    service = AppiumService()
+    service.start(args=["--address", "127.0.0.1", "--port", "4723"]) # Args
+
+    if not service.is_running or not service.is_listening: # Check if running
+        raise Exception("Failed to start Appium Server!")
+
+    print("✅ Appium Server Running!")
+
+    yield service
+    print("Stopping Appium Server...")
+    service.stop()
