@@ -24,7 +24,7 @@ android_caps = {
     "platformName": "Android",
     "appium:automationName": "UiAutomator2",
     "appium:udid": "RF8M21KVM1K",
-    # "appium:udid": "emulator-5554",
+    #"appium:udid": "emulator-5554",
     "appium:platformVersion": "12",
     #"appium:platformVersion": "16",
     "appium:deviceName": "Galaxy S10",

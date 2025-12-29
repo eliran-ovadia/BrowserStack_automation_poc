@@ -110,6 +110,7 @@ class BasePage:
         try:
             return self.wait.until(EC.presence_of_element_located(loc))
         except TimeoutException:
+            print(f"could not found the locator: {loc} in time.")
             return False
 
     def wait_gone(self, locator: AnyLocator) -> WebElement | bool:

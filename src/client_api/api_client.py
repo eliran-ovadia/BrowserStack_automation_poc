@@ -1,4 +1,4 @@
-from src.api_utils.api_auth import ApiAuth, handle_request
+from src.client_api.utils.api_auth import ApiAuth, handle_request
 from endpoint_models.portfolio import PortfolioEndpoint
 
 class ApiClient(ApiAuth):

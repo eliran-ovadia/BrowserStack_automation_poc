@@ -5,10 +5,10 @@ import requests
 import os
 import dotenv
 import json
-from src.api_utils.create_session import SESSION
-from src.api_utils.endpoint_models.oauth_token import OauthToken
-from src.api_utils.endpoint_models.dashboard_skip import DashboardSkip
-from src.api_utils.endpoint_models.vt_sso_platform import VtSsoPlatform
+from src.client_api.utils.create_session import SESSION
+from src.client_api.endpoint_models.oauth_token import OauthToken
+from src.client_api.endpoint_models.dashboard_skip import DashboardSkip
+from src.client_api.endpoint_models.vt_sso_platform import VtSsoPlatform
 
 dotenv.load_dotenv()
 API_KEY = os.getenv("API_KEY")
