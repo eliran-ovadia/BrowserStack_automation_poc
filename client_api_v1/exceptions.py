@@ -1,2 +1,0 @@
-class ApiClientError(Exception):
-    pass

@@ -4,8 +4,8 @@ from urllib.parse import urljoin
 
 
 class BaseClient:
-    def __init__(self, base_url):
-        self.base_url = base_url
+    def __init__(self, default_base_url):
+        self.base_url = default_base_url
         self.session = requests.Session()
         self.logger = logging.getLogger(self.__class__.__name__)
 

@@ -2,8 +2,8 @@ from time import sleep
 
 import pytest
 
-from src.pages.dashboard_page import DashboardPage
-from src.flows.login_flow import LoginFlow
+# from src.pages.dashboard_page import DashboardPage
+# from src.flows.login_flow import LoginFlow
 
 
 @pytest.mark.usefixtures("set_web_driver")
@@ -18,5 +18,4 @@ class TestTrading:
         sleep(5)
 
     def test_api_client(self, api_client):
-        x = 1
-        pass
+        print(api_client)
