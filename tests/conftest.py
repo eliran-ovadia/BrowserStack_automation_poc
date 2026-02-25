@@ -6,6 +6,7 @@ from appium import webdriver
 from appium.webdriver.appium_service import AppiumService
 from appium.options.android import UiAutomator2Options
 from appium.options.ios import XCUITestOptions
+from api_client_v2.src.api.auth_api import AuthAPI
 
 dotenv.load_dotenv()
 platform = os.getenv("TEST_PLATFORM").lower()
@@ -77,3 +78,21 @@ def appium_server():
     yield service
     print("Stopping Appium Server...")
     service.stop()
+
+
+@pytest.fixture(scope="session")
+def api_client():
+    """
+    Returns an Authenticated API Client.
+    Runs once per test session to save time.
+    """
+    client = AuthAPI()
+
+    # Get credentials from .env
+    user = os.getenv("API_USER")
+    pwd = os.getenv("API_PASSWORD")
+
+    # Perform the login flow
+    client.login_and_get_tokens(user, pwd)
+
+    return client

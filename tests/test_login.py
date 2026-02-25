@@ -16,3 +16,7 @@ class TestTrading:
         dashboard = DashboardPage(set_web_driver).nav_trade_portfolio()
 
         sleep(5)
+
+    def test_api_client(self, api_client):
+        x = 1
+        pass

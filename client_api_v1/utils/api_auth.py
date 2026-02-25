@@ -7,9 +7,9 @@ from urllib3.util.retry import Retry
 import dotenv
 import requests
 
-from client_api.endpoint_models.dashboard_skip import DashboardSkip
-from client_api.endpoint_models.oauth_token import OauthToken
-from client_api.endpoint_models.vt_sso_platform import VtSsoPlatform
+from client_api_v1.endpoint_models.dashboard_skip import DashboardSkip
+from client_api_v1.endpoint_models.oauth_token import OauthToken
+from client_api_v1.endpoint_models.vt_sso_platform import VtSsoPlatform
 
 dotenv.load_dotenv()
 API_KEY = os.getenv("API_KEY")
@@ -21,29 +21,6 @@ VT_TOKEN_URL = os.getenv("VT_TOKEN_URL")
 SCOPE = os.getenv("SCOPE")
 CLIENT_ID = os.getenv("CLIENT_ID")
 AUDIENCE = os.getenv("AUDIENCE")
-
-
-def handle_request(api_call: Callable[[], requests.Response], context: str = "an error has occurred with the client"):
-    """
-    This function is an exception handler for all api calls
-    :param api_call:
-    :param context:
-    :return: response from the api_call
-    """
-    try:
-        response = api_call()
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.RequestException as e:
-        status_code = e.response.status_code if e.response else None
-        print(f"Error in {context}: {e}, Status Code: {status_code}")
-        raise e
-    except json.decoder.JSONDecodeError as e:
-        print(f"JSON Decode Error in {context}: {e}")
-        raise e
-    except Exception as e:
-        print(f"Unexpected Error in {context}: {e}")
-        raise e
 
 
 class ApiAuth:
@@ -60,6 +37,29 @@ class ApiAuth:
         self.session_config()
         # refresh_tokens uses self.session, so it must be called after session initialization
         self.refresh_tokens()
+
+    @staticmethod
+    def handle_request(api_call: Callable[[], requests.Response], context: str = "an error has occurred with the client"):
+        """
+        This function is an exception handler for all api calls
+        :param api_call:
+        :param context:
+        :return: response from the api_call
+        """
+        try:
+            response = api_call()
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            status_code = e.response.status_code if e.response else None
+            print(f"Error in {context}: {e}, Status Code: {status_code}")
+            raise e
+        except json.decoder.JSONDecodeError as e:
+            print(f"JSON Decode Error in {context}: {e}")
+            raise e
+        except Exception as e:
+            print(f"Unexpected Error in {context}: {e}")
+            raise e
 
     def get_base_url(self):
         return self.base_url
@@ -87,21 +87,21 @@ class ApiAuth:
         payload = {"grant_type": "password", "username": USERNAME, "password": PASSWORD, "scope": SCOPE,
                    "client_id": CLIENT_ID, "audience": AUDIENCE, "api-key": API_KEY}
         api_call = lambda: self.session.post(url, json=payload)
-        response = handle_request(api_call=api_call, context="fetch oauth token")
+        response = self.handle_request(api_call=api_call, context="fetch oauth token")
         self.auth0_access_token = OauthToken(**response).get_access_token()
 
     def _fetch_vt_session_id(self):
         url = VT_TOKEN_URL
         payload = {'platform': 'auth0', 'token': self.auth0_access_token}
         api_call = lambda: self.session.post(url, json=payload)
-        response = handle_request(api_call=api_call, context="fetch vt token")
+        response = self.handle_request(api_call=api_call, context="fetch vt token")
         self.vt_session_id = VtSsoPlatform(**response).get_sessionId()
 
     def _fetch_dashboard_skip(self):
         url = f"{BASE_URL}/api/V2/dashboard/skip"
         headers = {"access_token": self.auth0_access_token, "api-key": API_KEY}
         api_call = lambda: self.session.get(url, headers=headers)
-        response = handle_request(api_call=api_call)
+        response = self.handle_request(api_call=api_call)
         dashboard_skip = DashboardSkip(**response)
         self.fmr_token = dashboard_skip.get_fmrToken()
         self.connection_token = dashboard_skip.get_connectionToken()

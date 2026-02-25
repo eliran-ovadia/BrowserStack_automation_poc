@@ -1,4 +1,4 @@
-from client_api.utils.api_auth import ApiAuth, handle_request
+from client_api_v1.utils.api_auth import ApiAuth
 from endpoint_models.portfolio import PortfolioEndpoint
 
 
@@ -9,7 +9,7 @@ class ApiClient(ApiAuth):
     def get_holdings_symbols(self):
         url = f"{self.base_url}/api/dual/account/portfolio?account=IBI1022"
         api_call = lambda: self.session.get(url)
-        response = handle_request(api_call)
+        response = self.handle_request(api_call)
         model = PortfolioEndpoint(**response)
         return model.get_holdings_names()
 

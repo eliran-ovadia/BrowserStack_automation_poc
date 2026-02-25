@@ -1,7 +1,7 @@
 from appium.webdriver.common.appiumby import AppiumBy
 
 from src.pages.base_page import BasePage
-from client_api import get_strings
+from client_api_v1 import get_strings
 
 
 class TermsPage(BasePage):

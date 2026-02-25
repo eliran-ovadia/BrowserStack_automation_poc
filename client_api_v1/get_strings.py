@@ -3,8 +3,8 @@ from functools import lru_cache
 
 import dotenv
 
-from client_api.utils.api_auth import handle_request
-from client_api.utils.create_session import SESSION
+from client_api_v1.utils.api_auth import handle_request
+from client_api_v1.utils.create_session import SESSION
 
 dotenv.load_dotenv()
 BASE_URL = os.getenv("BASE_URL")
