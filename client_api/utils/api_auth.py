@@ -1,14 +1,15 @@
+import json
+import os
 from typing import Callable
 
-import pytest
-import requests
-import os
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 import dotenv
-import json
-from src.client_api.utils.create_session import SESSION
-from src.client_api.endpoint_models.oauth_token import OauthToken
-from src.client_api.endpoint_models.dashboard_skip import DashboardSkip
-from src.client_api.endpoint_models.vt_sso_platform import VtSsoPlatform
+import requests
+
+from client_api.endpoint_models.dashboard_skip import DashboardSkip
+from client_api.endpoint_models.oauth_token import OauthToken
+from client_api.endpoint_models.vt_sso_platform import VtSsoPlatform
 
 dotenv.load_dotenv()
 API_KEY = os.getenv("API_KEY")
@@ -34,26 +35,30 @@ def handle_request(api_call: Callable[[], requests.Response], context: str = "an
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
-        status_code = getattr(e.response, '999')
-        if 400 <= status_code < 500:
-            pass
-        else:
-            pass
+        status_code = e.response.status_code if e.response else None
+        print(f"Error in {context}: {e}, Status Code: {status_code}")
+        raise e
     except json.decoder.JSONDecodeError as e:
-        pass
+        print(f"JSON Decode Error in {context}: {e}")
+        raise e
     except Exception as e:
-        pass
+        print(f"Unexpected Error in {context}: {e}")
+        raise e
 
 
 class ApiAuth:
     def __init__(self):
         self.base_url = BASE_URL
-        self.session = SESSION
         self.auth0_access_token = None
-        self.vt_sessionId = None
-        self.vtToken = None
+        self.vt_session_id = None
+        self.vt_token = None
         self.fmr_token = None
         self.connection_token = None
+        self.headers = None
+        
+        self.session = requests.Session()
+        self.session_config()
+        # refresh_tokens uses self.session, so it must be called after session initialization
         self.refresh_tokens()
 
     def get_base_url(self):
@@ -66,10 +71,10 @@ class ApiAuth:
         return self.auth0_access_token
 
     def get_vt_session_id(self):
-        return self.vt_sessionId
+        return self.vt_session_id
 
     def get_vt_token(self):
-        return self.vtToken
+        return self.vt_token
 
     def get_fmr_token(self):
         return self.fmr_token
@@ -80,17 +85,17 @@ class ApiAuth:
     def _fetch_auth0_access_token(self):
         url = f"{OAUTH_BASE_URL}/oauth/token"
         payload = {"grant_type": "password", "username": USERNAME, "password": PASSWORD, "scope": SCOPE,
-                         "client_id": CLIENT_ID, "audience": AUDIENCE, "api-key": API_KEY}
+                   "client_id": CLIENT_ID, "audience": AUDIENCE, "api-key": API_KEY}
         api_call = lambda: self.session.post(url, json=payload)
         response = handle_request(api_call=api_call, context="fetch oauth token")
         self.auth0_access_token = OauthToken(**response).get_access_token()
 
-    def _fetch_vt_sessionId(self):
+    def _fetch_vt_session_id(self):
         url = VT_TOKEN_URL
-        payload = {'platform':'auth0', 'token': self.auth0_access_token}
+        payload = {'platform': 'auth0', 'token': self.auth0_access_token}
         api_call = lambda: self.session.post(url, json=payload)
         response = handle_request(api_call=api_call, context="fetch vt token")
-        self.vt_sessionId = VtSsoPlatform(**response).get_sessionId()
+        self.vt_session_id = VtSsoPlatform(**response).get_sessionId()
 
     def _fetch_dashboard_skip(self):
         url = f"{BASE_URL}/api/V2/dashboard/skip"
@@ -100,14 +105,32 @@ class ApiAuth:
         dashboard_skip = DashboardSkip(**response)
         self.fmr_token = dashboard_skip.get_fmrToken()
         self.connection_token = dashboard_skip.get_connectionToken()
-        self.vtToken = dashboard_skip.get_vtToken()
+        self.vt_token = dashboard_skip.get_vtToken()
 
     def refresh_tokens(self):
         self._fetch_auth0_access_token()
-        self._fetch_vt_sessionId()
+        self._fetch_vt_session_id()
         self._fetch_dashboard_skip()
+        self.headers = {
+            "Content-Type": "application/json",
+            "connection": "keep-alive",
+            'Authorization': self.vt_token,
+            'fmr_token': self.fmr_token,
+            'access_token': self.auth0_access_token,
+            'connection_token': self.connection_token,
+        }
+        self.session.headers.update(self.headers)
 
+    def get_auth_headers(self):
+        return self.headers
 
-if __name__ == "__main__":
-    client = ApiAuth()
-    x = 1
+    def session_config(self):
+        retry_strategy = Retry(
+            total=3,
+            backoff_factor=1,
+            status_forcelist=[500, 502, 503, 504],
+            allowed_methods=["GET"]
+        )
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        self.session.mount("http://", adapter)
+        self.session.mount("https://", adapter)

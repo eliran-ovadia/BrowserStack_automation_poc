@@ -1,5 +1,3 @@
-
-
 class DashboardSkip:
     def __init__(self, **kwargs):
         self._vtToken = kwargs.get("vtToken")

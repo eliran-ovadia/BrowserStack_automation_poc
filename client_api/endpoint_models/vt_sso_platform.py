@@ -1,5 +1,3 @@
-
-
 class VtSsoPlatform:
     def __init__(self, **kwargs):
         self._sessionId = kwargs.get("sessionId")

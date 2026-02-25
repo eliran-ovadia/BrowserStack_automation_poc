@@ -2,7 +2,7 @@ import os
 
 from appium.webdriver.common.appiumby import AppiumBy
 
-from src.client_api.get_strings import get_strings
+from client_api import get_strings
 from src.pages.base_page import BasePage
 
 
