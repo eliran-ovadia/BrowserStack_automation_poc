@@ -17,3 +17,4 @@ class TestTrading:
         login_flow = LoginFlow(set_web_driver).login_with_credentials()
         dashboard = pf.dashboard().nav_trade_portfolio()
 
+        sleep(5)

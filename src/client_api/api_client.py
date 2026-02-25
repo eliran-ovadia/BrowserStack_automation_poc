@@ -1,5 +1,6 @@
-from src.client_api.utils.api_auth import ApiAuth, handle_request
 from endpoint_models.portfolio import PortfolioEndpoint
+from src.client_api.utils.api_auth import ApiAuth, handle_request
+
 
 class ApiClient(ApiAuth):
     def __init__(self):
@@ -17,7 +18,6 @@ class ApiClient(ApiAuth):
         response = handle_request(api_call)
         model = PortfolioEndpoint(**response)
         return model.get_holdings_names()
-
 
 
 if __name__ == "__main__":

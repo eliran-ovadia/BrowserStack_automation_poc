@@ -7,6 +7,7 @@ from src.client_api.utils.create_session import SESSION
 dotenv.load_dotenv()
 BASE_URL = os.getenv("BASE_URL")
 API_KEY = os.getenv("API_KEY")
+
 @lru_cache(maxsize=None)
 def get_strings(page: str):
     session = SESSION
