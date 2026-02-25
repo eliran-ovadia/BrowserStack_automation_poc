@@ -22,10 +22,7 @@ class BasePage:
         self.driver = driver
         self.wait = WebDriverWait(driver, timeout)
         self.platform = (driver.capabilities.get("platformName") or "").lower()
-
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.logger.setLevel(logging.INFO)
-        self.logger.propagate = True
         self.window_size = None
 
         # ---------------- Locator resolution ----------------
